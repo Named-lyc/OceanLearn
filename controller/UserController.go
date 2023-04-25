@@ -90,13 +90,23 @@ func Login(context *gin.Context) {
 		return
 	}
 	//发放token
-	token := "11"
+	token, err := common.ReleaseToken(user)
+	if err != nil {
+		context.JSON(http.StatusInternalServerError, gin.H{"code": "500", "msg": "系统异常"})
+		log.Printf("token generate err： %v", err)
+		return
+	}
 	//返回结果
 	context.JSON(200, gin.H{
 		"code": 200,
 		"data": gin.H{"token": token},
 		"msg":  "登录成功",
 	})
+}
+
+func Info(context *gin.Context) {
+	user, _ := context.Get("user")
+	context.JSON(http.StatusOK, gin.H{"code": 200, "data": gin.H{"user": user}})
 }
 
 func isTelephoneExist(db *gorm.DB, telephone string) bool {
